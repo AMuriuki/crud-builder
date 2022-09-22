@@ -1,6 +1,10 @@
-export function crudBuilder(baseRoute) {
-    function list(keyword) {
-        return fetch(`${baseRoute}?keyword=${keyword}`);
+export function crudBuilder(baseRoute, transformUserFilters) {
+    function list(filters) {
+        let params = transformUserFilters(filters)?.join("&");
+        if (params) {
+            params += "?"
+        }
+        return fetch(`${baseRoute}${params}`);
     }
 
     function show(id) {
@@ -26,4 +30,29 @@ export function crudBuilder(baseRoute) {
         update,
         remove
     }
+}
+
+
+/**
+ * handle filtering of lists
+ * we'll assume a users list that needs filtering
+ * for example:
+ * 
+ * const filters = {
+ *      keyword: "john",
+ *      createdAt: new Date("2020-02-10")
+ * }
+ * 
+ * modify according to your needs
+ */
+function transformUserFilters(filters) {
+    const params = []
+    if (filters.keyword) {
+        params.push(`keyword=${filters.keyword}`)
+    }
+    if (filters.createdAt) {
+        params.push(`created_at=${dateUtility.format(filters.createdAt)}`);
+    }
+
+    return params
 }
