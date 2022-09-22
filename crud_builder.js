@@ -1,4 +1,4 @@
-export function crudBuilder(baseRoute, transformUserFilters, transformEntity) {
+export function crudBuilder(baseRoute, transformUserFilters, transformEntity, prepareFormValues) {
     async function list(filters) {
         let params = transformUserFilters(filters)?.join("&");
         if (params) {
@@ -18,7 +18,7 @@ export function crudBuilder(baseRoute, transformUserFilters, transformEntity) {
     }
 
     function create(formValues) {
-        return fetch(baseRoute, { method: "POST", body: formValues });
+        return fetch(baseRoute, { method: "POST", body: prepareFormValues(formValues), });
     }
 
     function update(id, formValues) {
@@ -81,3 +81,12 @@ function transformUserFilters(filters) {
 function transformEntity() {
 
 }
+
+/**
+ * transforming `formValues` into the format the API expects
+ * example: imagine a select element that posts a City object
+ * and the api requires the city's id
+ *  
+ */
+
+const prepareFormValues = formValues => ({ city_id: formValues.city.id })
