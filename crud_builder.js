@@ -1,10 +1,16 @@
-export function crudBuilder(baseRoute, transformUserFilters) {
-    function list(filters) {
+export function crudBuilder(baseRoute, transformUserFilters, transformEntity) {
+    async function list(filters) {
         let params = transformUserFilters(filters)?.join("&");
         if (params) {
             params += "?"
         }
-        return fetch(`${baseRoute}${params}`);
+
+        const res = await fetch(`${baseRoute}${params}`);
+        const res_1 = await res.json();
+        return res_1.json({
+            data: res_1.data.map((entity) => transformEntity(entity)),
+            pagination: res_1.pagination
+        });
     }
 
     function show(id) {
@@ -55,4 +61,23 @@ function transformUserFilters(filters) {
     }
 
     return params
+}
+
+
+/**
+ * serialization & pagination
+ * assuming that paginated data from the API 
+ * takes the following shape:
+ * 
+ * {
+ *       data: [] // list of entity objects
+ *       pagination: {...}, pagination info
+ * }
+ * 
+ * modify according to your needs. all you need
+ * is determine how you should transform a single object
+*/
+
+function transformEntity() {
+
 }
